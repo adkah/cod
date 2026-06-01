@@ -7,15 +7,18 @@
   ],
   "type": "module",
   "scripts": {
+    "build": "bun run --filter './packages/*' build",
     "check": "bun run --parallel check:format check:lint check:type",
     "check:format": "bun oxfmt --check .",
     "check:lint": "bun oxlint",
     "check:type": "bun tsc --noEmit",
+    "test": "bun test",
     "fix": "bun run --sequential fix:format fix:lint",
     "fix:format": "bun oxfmt .",
     "fix:lint": "bun oxlint --fix"
   },
   "devDependencies": {
+    "@types/bun": "^1.3.14",
     "@types/node": "^25.9.1",
     "oxfmt": "^0.52.0",
     "oxlint": "^1.67.0",

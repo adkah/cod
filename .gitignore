@@ -9,3 +9,5 @@ dist/
 bun.lockb
 
 .DS_Store
+
+apps/test/
