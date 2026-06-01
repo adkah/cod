@@ -1,0 +1,24 @@
+{
+  "name": "cod-root",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "check": "bun run --parallel check:format check:lint check:type",
+    "check:format": "bun oxfmt --check .",
+    "check:lint": "bun oxlint",
+    "check:type": "bun tsc --noEmit",
+    "fix": "bun run --sequential fix:format fix:lint",
+    "fix:format": "bun oxfmt .",
+    "fix:lint": "bun oxlint --fix"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "oxfmt": "^0.52.0",
+    "oxlint": "^1.67.0",
+    "typescript": "^6.0.3"
+  }
+}
