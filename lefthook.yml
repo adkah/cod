@@ -1,0 +1,15 @@
+pre-commit:
+  parallel: true
+  commands:
+    format:
+      glob: '**/*.{ts,md,json,yml}'
+      run: bun run check:format
+    lint:
+      glob: '**/*.ts'
+      run: bun run check:lint
+    type:
+      glob: '**/*.ts'
+      run: bun run check:type
+    test:
+      glob: '**/*.ts'
+      run: bun run test
