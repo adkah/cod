@@ -1,6 +1,19 @@
 import { serializeMarkdownEntry, toMarkdownHref } from './markdown.js'
 import type { DynamicCollectionEntry, SidebarNode, SidebarTreeResult } from '../types.js'
 
+export interface RenderLlmsTxtOptions {
+  title: string
+  description?: string
+  siteUrl: string
+  sidebar: SidebarTreeResult
+}
+
+export interface RenderLlmsFullTxtOptions {
+  siteUrl: string
+  sidebar: SidebarTreeResult
+  entriesBySlug: Map<string, DynamicCollectionEntry>
+}
+
 export function collectOrderedSlugs(nodes: SidebarNode[]): string[] {
   return nodes.flatMap((node) => {
     if (node.type === 'page') return [node.path]
@@ -9,12 +22,7 @@ export function collectOrderedSlugs(nodes: SidebarNode[]): string[] {
   })
 }
 
-export function renderLlmsTxt(options: {
-  title: string
-  description?: string
-  siteUrl: string
-  sidebar: SidebarTreeResult
-}): string {
+export function renderLlmsTxt(options: RenderLlmsTxtOptions): string {
   const lines = [`# ${options.title}`]
   if (options.description?.trim()) lines.push('', options.description.trim())
 
@@ -26,11 +34,7 @@ export function renderLlmsTxt(options: {
   return `${lines.join('\n')}\n`
 }
 
-export function renderLlmsFullTxt(options: {
-  siteUrl: string
-  sidebar: SidebarTreeResult
-  entriesBySlug: Map<string, DynamicCollectionEntry>
-}): string {
+export function renderLlmsFullTxt(options: RenderLlmsFullTxtOptions): string {
   const orderedSlugs = new Set<string>()
   const pages: string[] = []
 

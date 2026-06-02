@@ -86,6 +86,11 @@ export interface AdjacentPages {
   next: AdjacentPage | null
 }
 
+export interface BreadcrumbItem {
+  label: string
+  href?: string
+}
+
 export interface PageEntry {
   slug: string
   title: string
@@ -106,7 +111,7 @@ export interface PageContext extends SiteContext {
   description: string | undefined
   activeTab: string | null
   sidebarTree: SidebarNode[]
-  breadcrumbs: { label: string; href?: string }[]
+  breadcrumbs: BreadcrumbItem[]
   prev: AdjacentPage | null
   next: AdjacentPage | null
 }

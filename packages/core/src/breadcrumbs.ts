@@ -1,11 +1,11 @@
-import type { SidebarNode, SidebarTreeResult } from './types.js'
+import type { BreadcrumbItem, SidebarNode, SidebarTreeResult } from './types.js'
 import { isPathActive, resolveActiveSidebarTree } from './nav.js'
 
 export async function buildBreadcrumbs(
   sidebar: SidebarTreeResult,
   pathname: string,
   title: string
-): Promise<{ label: string; href?: string }[]> {
+): Promise<BreadcrumbItem[]> {
   const { sidebarTree } = resolveActiveSidebarTree(sidebar, pathname)
   const match = findBreadcrumbPath(sidebarTree, pathname, [])
   return match ?? [{ label: title }]
@@ -14,8 +14,8 @@ export async function buildBreadcrumbs(
 function findBreadcrumbPath(
   nodes: SidebarNode[],
   pathname: string,
-  ancestors: { label: string; href?: string }[]
-): { label: string; href?: string }[] | null {
+  ancestors: BreadcrumbItem[]
+): BreadcrumbItem[] | null {
   for (const node of nodes) {
     if (node.type === 'page') {
       if (isPathActive(pathname, node.href)) return [...ancestors, { label: node.title }]

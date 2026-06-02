@@ -4,6 +4,7 @@ export { CodSite } from './site.js'
 export type {
   AdjacentPage,
   AdjacentPages,
+  BreadcrumbItem,
   CodConfig,
   CodIntegrationOptions,
   CollectionGroupItem,
