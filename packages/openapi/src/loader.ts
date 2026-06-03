@@ -5,11 +5,11 @@ import type { ApiLoaderOptions } from './types.js'
 export function apiLoader(options: ApiLoaderOptions): Loader {
   return {
     name: 'cod-openapi-loader',
-    async load({ store, logger }) {
+    async load({ store, logger, parseData }) {
       store.clear()
       const entries = await extractApiEntries(options)
       for (const entry of entries) {
-        store.set({
+        const data = await parseData({
           id: entry.id,
           data: {
             title: entry.title,
@@ -20,6 +20,11 @@ export function apiLoader(options: ApiLoaderOptions): Loader {
             sortOrder: entry.sortOrder,
             endpoint: entry.endpoint,
           },
+        })
+
+        store.set({
+          id: entry.id,
+          data,
         })
       }
       if (entries.length === 0) logger.warn(`[Cod API] No operations found for ${options.slug}`)
