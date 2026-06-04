@@ -2,6 +2,13 @@ import type { Loader } from 'astro/loaders'
 import { extractApiEntries } from './openapi.js'
 import type { ApiLoaderOptions } from './types.js'
 
+/**
+ * Creates an Astro content loader that generates one entry per OpenAPI operation.
+ *
+ * The loader clears the target store on each run, dereferences the configured
+ * OpenAPI 3.x source, parses each generated entry through Astro's `parseData`,
+ * and stores entries with ids like `${slug}/${operation}`.
+ */
 export function apiLoader(options: ApiLoaderOptions): Loader {
   return {
     name: 'cod-openapi-loader',

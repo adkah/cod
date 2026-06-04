@@ -16,17 +16,34 @@ import { slugify } from './utils.js'
 
 const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'] as const
 
+/** API entry generated from a single OpenAPI operation before Astro stores it. */
 export interface ExtractedApiEntry {
+  /** Stable entry id, built from the configured API slug and generated operation slug. */
   id: string
+  /** Entry title from operation summary, operation id, or method/path fallback. */
   title: string
+  /** Long-form operation description, when provided. */
   description?: string
+  /** Uppercase HTTP method for display and filtering. */
   method: string
+  /** API grouping slug copied from loader options. */
   apiSlug: string
+  /** Human-readable API grouping label copied from loader options. */
   apiLabel: string
+  /** Zero-based order based on traversal through paths and methods. */
   sortOrder: number
+  /** Generated endpoint details for rendering the operation. */
   endpoint: Endpoint
 }
 
+/**
+ * Loads and dereferences an OpenAPI 3.x document.
+ *
+ * String sources are resolved relative to `process.cwd()`. File URLs are loaded
+ * from disk, non-file URLs are passed through to the Swagger parser, object
+ * sources are used directly, and function sources are awaited before
+ * dereferencing.
+ */
 export async function loadOpenApiSpec(source: ApiLoaderOptions['source']): Promise<DereferencedOpenApiSpec> {
   if (typeof source === 'function') return loadOpenApiFromObject(await source())
   if (source instanceof URL) {
@@ -39,6 +56,14 @@ export async function loadOpenApiSpec(source: ApiLoaderOptions['source']): Promi
   return loadOpenApiFromObject(source)
 }
 
+/**
+ * Extracts generated API reference entries from an OpenAPI 3.x document.
+ *
+ * Entry ids use the configured `slug` plus either the operation id or a
+ * method/path fallback. Operations with any matching `excludeTags` value are
+ * skipped. Operation-level parameters override path-level parameters with the
+ * same `in:name`, and duplicate generated ids throw an error.
+ */
 export async function extractApiEntries(options: ApiLoaderOptions): Promise<ExtractedApiEntry[]> {
   const spec = await loadOpenApiSpec(options.source)
   const entries: ExtractedApiEntry[] = []
@@ -96,6 +121,7 @@ export async function extractApiEntries(options: ApiLoaderOptions): Promise<Extr
   return entries
 }
 
+/** Returns the generated entry ids for an OpenAPI document without exposing entry data. */
 export async function getApiEntryIds(options: ApiLoaderOptions): Promise<string[]> {
   const entries = await extractApiEntries(options)
   return entries.map((entry) => entry.id)
