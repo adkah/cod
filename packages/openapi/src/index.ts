@@ -11,6 +11,7 @@ export type {
   OpenApiOperation,
   OpenApiPathItem,
   OpenApiServer,
+  OpenApiEntryData,
   OpenApiSpec,
   Parameter,
   RequestBody,

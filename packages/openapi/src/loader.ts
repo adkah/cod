@@ -22,10 +22,8 @@ export function apiLoader(options: ApiLoaderOptions): Loader {
             title: entry.title,
             description: entry.description,
             method: entry.method,
-            apiSlug: entry.apiSlug,
-            apiLabel: entry.apiLabel,
             sortOrder: entry.sortOrder,
-            endpoint: entry.endpoint,
+            openapi: entry.openapi,
           },
         })
 

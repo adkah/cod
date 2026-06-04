@@ -37,22 +37,24 @@ describe('OpenAPI extraction', () => {
     expect(entries[0]).toMatchObject({
       title: 'Add a new pet to the store.',
       method: 'POST',
-      apiSlug: 'api',
-      apiLabel: 'API',
       sortOrder: 0,
-      endpoint: {
-        method: 'POST',
-        path: '/pet',
-        baseUrl: '/api/v3',
-        security: [{ petstore_auth: ['write:pets', 'read:pets'] }],
-        securitySchemes: {
-          api_key: { type: 'apiKey', name: 'api_key', in: 'header' },
-          petstore_auth: { type: 'oauth2' },
+      openapi: {
+        apiSlug: 'api',
+        apiLabel: 'API',
+        endpoint: {
+          method: 'POST',
+          path: '/pet',
+          baseUrl: '/api/v3',
+          security: [{ petstore_auth: ['write:pets', 'read:pets'] }],
+          securitySchemes: {
+            api_key: { type: 'apiKey', name: 'api_key', in: 'header' },
+            petstore_auth: { type: 'oauth2' },
+          },
         },
       },
     })
     expect(entries[0]?.description).toBe('Add a new pet to the store.')
-    expect(entries[0]?.endpoint.requestBody).toBeDefined()
+    expect(entries[0]?.openapi.endpoint.requestBody).toBeDefined()
   })
 
   test('excludes tags explicitly', async () => {
@@ -105,7 +107,7 @@ describe('OpenAPI extraction', () => {
       source: () => petstore as unknown as OpenApiSpec,
     })
 
-    expect(entries[0]?.endpoint.requestBody?.content?.['application/json']?.schema).toMatchObject({
+    expect(entries[0]?.openapi.endpoint.requestBody?.content?.['application/json']?.schema).toMatchObject({
       type: 'object',
       required: ['name', 'photoUrls'],
     })
@@ -134,7 +136,7 @@ describe('OpenAPI extraction', () => {
       },
     })
 
-    expect(entries[0]?.endpoint.parameters).toEqual([
+    expect(entries[0]?.openapi.endpoint.parameters).toEqual([
       { name: 'petId', in: 'path', required: true, description: 'Operation-level ID' },
       { name: 'include', in: 'query', description: 'Path-level include' },
     ])

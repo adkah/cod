@@ -204,12 +204,22 @@ export type ApiSpecSource = string | URL | OpenApiSpec | (() => OpenApiSpec | Pr
 export interface ApiLoaderOptions {
   /** Entry id prefix and API grouping slug, such as `api` in `api/list-pets`. */
   slug: string
-  /** Human-readable API label copied to each generated entry as `apiLabel`. */
+  /** Human-readable API label copied to each generated entry's OpenAPI payload. */
   label: string
   /** OpenAPI document source to load and dereference. */
   source: ApiSpecSource
   /** Exclude operations that have any matching tag. */
   excludeTags?: string[]
+}
+
+/** OpenAPI-specific payload stored on generated API entries. */
+export interface OpenApiEntryData {
+  /** API grouping slug copied from loader options. */
+  apiSlug: string
+  /** Human-readable API grouping label copied from loader options. */
+  apiLabel: string
+  /** Generated endpoint details for rendering the operation. */
+  endpoint: Endpoint
 }
 
 /** Data shape stored for each generated Astro content collection entry. */
@@ -220,12 +230,15 @@ export interface ApiEntryData {
   description?: string
   /** Uppercase HTTP method for display and filtering. */
   method: string
-  /** API grouping slug copied from loader options. */
-  apiSlug: string
-  /** Human-readable API grouping label copied from loader options. */
-  apiLabel: string
   /** Zero-based order based on traversal through paths and methods. */
   sortOrder: number
-  /** Generated endpoint details for rendering the operation. */
-  endpoint: Endpoint
+  /** OpenAPI-specific payload; also acts as the API page discriminator. */
+  openapi: OpenApiEntryData
+}
+
+declare global {
+  interface CodEntryDataExtensions {
+    /** OpenAPI-specific payload when the entry represents an OpenAPI operation. */
+    openapi?: OpenApiEntryData
+  }
 }

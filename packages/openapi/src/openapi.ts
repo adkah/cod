@@ -9,6 +9,7 @@ import type {
   OpenApiOperation,
   OpenApiPathItem,
   OpenApiSpec,
+  OpenApiEntryData,
   Parameter,
   ServerVariable,
 } from './types.js'
@@ -26,14 +27,10 @@ export interface ExtractedApiEntry {
   description?: string
   /** Uppercase HTTP method for display and filtering. */
   method: string
-  /** API grouping slug copied from loader options. */
-  apiSlug: string
-  /** Human-readable API grouping label copied from loader options. */
-  apiLabel: string
   /** Zero-based order based on traversal through paths and methods. */
   sortOrder: number
-  /** Generated endpoint details for rendering the operation. */
-  endpoint: Endpoint
+  /** OpenAPI-specific payload. */
+  openapi: OpenApiEntryData
 }
 
 /**
@@ -108,10 +105,12 @@ export async function extractApiEntries(options: ApiLoaderOptions): Promise<Extr
         id,
         title,
         method: method.toUpperCase(),
-        apiSlug: options.slug,
-        apiLabel: options.label,
         sortOrder: entries.length,
-        endpoint,
+        openapi: {
+          apiSlug: options.slug,
+          apiLabel: options.label,
+          endpoint,
+        },
       }
       if (operation.description !== undefined) entry.description = operation.description
       entries.push(entry)

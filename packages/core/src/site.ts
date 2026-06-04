@@ -39,7 +39,10 @@ export class CodSite {
     return this.#context
   }
 
-  async getPageContext(pathname: string, entry: DynamicCollectionEntry): Promise<PageContext> {
+  async getPageContext<TEntry extends DynamicCollectionEntry>(
+    pathname: string,
+    entry: TEntry
+  ): Promise<PageContext<TEntry['data']>> {
     const context = await this.getContext()
     const title = entry.data.title
     const description = entry.data.description

@@ -48,13 +48,18 @@ export const endpointSchema = z.looseObject({
   tags: z.array(z.string()).optional(),
 })
 
+/** Validates OpenAPI-specific payload stored on generated API entries. */
+export const openApiEntryDataSchema = z.object({
+  apiSlug: z.string(),
+  apiLabel: z.string(),
+  endpoint: endpointSchema,
+})
+
 /** Validates the generated Astro content collection entry data shape. */
 export const apiCollectionSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
   method: z.string(),
-  apiSlug: z.string(),
-  apiLabel: z.string(),
   sortOrder: z.number(),
-  endpoint: endpointSchema,
+  openapi: openApiEntryDataSchema,
 })
