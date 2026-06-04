@@ -216,7 +216,7 @@ function entriesByCollection(): Map<string, DynamicCollectionEntry[]> {
 }
 
 function entry(id: string, title: string, data: Record<string, unknown> = {}): DynamicCollectionEntry {
-  return { id, body: '', data: { title, ...data } }
+  return { id, body: '', collection: 'test', data: { title, ...data } }
 }
 
 async function makeTempDir(): Promise<string> {

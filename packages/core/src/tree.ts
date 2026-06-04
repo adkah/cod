@@ -11,7 +11,15 @@ import type {
   TabItem,
 } from './types.js'
 import { getRouteSlugForEntry } from './content.js'
-import { hrefForSlug, lastPathSegment, normalizeEntryId, normalizeSlug, slugifyLabel, titleFromSlug } from './utils.js'
+import {
+  getEntryBadge,
+  hrefForSlug,
+  lastPathSegment,
+  normalizeEntryId,
+  normalizeSlug,
+  slugifyLabel,
+  titleFromSlug,
+} from './utils.js'
 
 type EntryLookup = Map<string, DynamicCollectionEntry>
 
@@ -143,7 +151,8 @@ function pageFromEntry(path: string, entry: DynamicCollectionEntry | undefined):
     path,
   }
   if (entry?.data.sidebarTitle) node.sidebarTitle = entry.data.sidebarTitle
-  if (entry?.data.method) node.method = entry.data.method
+  const badge = getEntryBadge(entry)
+  if (badge) node.badge = badge
   if (entry?.data.icon) node.icon = entry.data.icon
   return node
 }

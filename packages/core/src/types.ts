@@ -1,3 +1,5 @@
+import type { CollectionEntry, CollectionKey } from 'astro:content'
+
 export interface CodConfig {
   defaultCollection: string
   navigation: {
@@ -26,19 +28,24 @@ export interface CollectionGroupItem {
   collection: string
 }
 
-export interface DynamicCollectionEntry {
-  id: string
-  body?: string
-  data: {
-    title: string
-    description?: string
-    sidebarTitle?: string
-    icon?: string
-    method?: string
-    prose?: boolean
-    sortOrder?: number
-    [key: string]: unknown
-  }
+declare global {
+  interface CodEntryDataExtensions {}
+}
+
+export interface EntryDataExtensions extends CodEntryDataExtensions {}
+
+export interface BaseEntryData extends EntryDataExtensions {
+  title: string
+  description?: string
+  sidebarTitle?: string
+  icon?: string
+  badge?: string
+  prose?: boolean
+  sortOrder?: number
+}
+
+export type DynamicCollectionEntry<TData extends BaseEntryData = BaseEntryData> = CollectionEntry<CollectionKey> & {
+  data: TData
 }
 
 export interface TabInfo {
@@ -72,7 +79,7 @@ export interface SidebarPageNode {
   sidebarTitle?: string
   href: string
   path: string
-  method?: string
+  badge?: string
   icon?: string
 }
 
@@ -94,7 +101,7 @@ export interface BreadcrumbItem {
 export interface PageEntry {
   slug: string
   title: string
-  method?: string
+  badge?: string
 }
 
 export interface SiteContext {
@@ -105,8 +112,8 @@ export interface SiteContext {
   defaultEntriesBySlug: Map<string, DynamicCollectionEntry>
 }
 
-export interface PageContext extends SiteContext {
-  entry: DynamicCollectionEntry
+export interface PageContext<TData extends BaseEntryData = BaseEntryData> extends SiteContext {
+  entry: DynamicCollectionEntry<TData>
   title: string
   description: string | undefined
   activeTab: string | null
@@ -116,10 +123,10 @@ export interface PageContext extends SiteContext {
   next: AdjacentPage | null
 }
 
-export interface StaticPath {
+export interface StaticPath<TData extends BaseEntryData = BaseEntryData> {
   params: { slug: string | undefined }
   props: {
-    entry: DynamicCollectionEntry
+    entry: DynamicCollectionEntry<TData>
     collectionName: string
   }
 }

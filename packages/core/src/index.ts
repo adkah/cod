@@ -4,11 +4,13 @@ export { CodSite } from './site.js'
 export type {
   AdjacentPage,
   AdjacentPages,
+  BaseEntryData,
   BreadcrumbItem,
   CodConfig,
   CodIntegrationOptions,
   CollectionGroupItem,
   DynamicCollectionEntry,
+  EntryDataExtensions,
   GroupItem,
   PageContext,
   PageEntry,
