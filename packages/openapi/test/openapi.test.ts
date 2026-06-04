@@ -90,7 +90,7 @@ describe('OpenAPI extraction', () => {
         })
       )
 
-      await expect(extractApiEntries({ slug: 'api', label: 'API', source: specPath })).rejects.toThrow(
+      return expect(extractApiEntries({ slug: 'api', label: 'API', source: specPath })).rejects.toThrow(
         'Unsupported OpenAPI spec version'
       )
     } finally {
@@ -158,7 +158,7 @@ describe('OpenAPI extraction', () => {
   })
 
   test('throws on duplicate generated entry ids', async () => {
-    expect(
+    return expect(
       extractApiEntries({
         slug: 'api',
         label: 'API',
@@ -175,6 +175,6 @@ describe('OpenAPI extraction', () => {
   })
 
   test('returns generated API entry ids', async () => {
-    expect(getApiEntryIds({ slug: 'api', label: 'API', source: fixtureUrl })).resolves.toEqual(petstoreEntryIds)
+    return expect(getApiEntryIds({ slug: 'api', label: 'API', source: fixtureUrl })).resolves.toEqual(petstoreEntryIds)
   })
 })
