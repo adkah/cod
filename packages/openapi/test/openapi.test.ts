@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { extractApiEntries, getApiEntryIds, loadOpenApiSpec } from '../src/openapi.js'
-import { fixturePath, fixtureUrl } from './fixtures.js'
+import type { OpenApiSpec } from '../src/types.js'
+import { fixturePath, fixtureUrl, petstore } from './fixtures.js'
 
 const petstoreEntryIds = [
   'api/addpet',
@@ -69,7 +70,83 @@ describe('OpenAPI extraction', () => {
     expect(entries).toHaveLength(19)
   })
 
+  test('dereferences source function results', async () => {
+    const entries = await extractApiEntries({
+      slug: 'api',
+      label: 'API',
+      source: () => petstore as unknown as OpenApiSpec,
+    })
+
+    expect(entries[0]?.endpoint.requestBody?.content?.['application/json']?.schema).toMatchObject({
+      type: 'object',
+      required: ['name', 'photoUrls'],
+    })
+  })
+
+  test('operation parameters override path parameters by name and location', async () => {
+    const entries = await extractApiEntries({
+      slug: 'api',
+      label: 'API',
+      source: {
+        openapi: '3.0.0',
+        info: { title: 'Test API', version: '1.0.0' },
+        paths: {
+          '/pets/{petId}': {
+            parameters: [
+              { name: 'petId', in: 'path', required: true, description: 'Path-level ID' },
+              { name: 'include', in: 'query', description: 'Path-level include' },
+            ],
+            get: {
+              operationId: 'getPet',
+              parameters: [{ name: 'petId', in: 'path', required: true, description: 'Operation-level ID' }],
+              responses: { '200': { description: 'OK' } },
+            },
+          },
+        },
+      },
+    })
+
+    expect(entries[0]?.endpoint.parameters).toEqual([
+      { name: 'petId', in: 'path', required: true, description: 'Operation-level ID' },
+      { name: 'include', in: 'query', description: 'Path-level include' },
+    ])
+  })
+
+  test('distinguishes fallback ids for path parameters and literal segments', async () => {
+    const entries = await extractApiEntries({
+      slug: 'api',
+      label: 'API',
+      source: {
+        openapi: '3.0.0',
+        info: { title: 'Test API', version: '1.0.0' },
+        paths: {
+          '/pets/{petId}': { get: { summary: 'Get pet by ID', responses: { '200': { description: 'OK' } } } },
+          '/pets/petId': { get: { summary: 'Get literal petId', responses: { '200': { description: 'OK' } } } },
+        },
+      },
+    })
+
+    expect(entries.map((entry) => entry.id)).toEqual(['api/get-pets-by-petid', 'api/get-pets-petid'])
+  })
+
+  test('throws on duplicate generated entry ids', async () => {
+    expect(
+      extractApiEntries({
+        slug: 'api',
+        label: 'API',
+        source: {
+          openapi: '3.0.0',
+          info: { title: 'Test API', version: '1.0.0' },
+          paths: {
+            '/pets': { get: { operationId: 'list_pets', responses: { '200': { description: 'OK' } } } },
+            '/animals': { get: { operationId: 'list-pets', responses: { '200': { description: 'OK' } } } },
+          },
+        },
+      })
+    ).rejects.toThrow('Duplicate OpenAPI entry id "api/list-pets"')
+  })
+
   test('returns generated API entry ids', async () => {
-    await expect(getApiEntryIds({ slug: 'api', label: 'API', source: fixtureUrl })).resolves.toEqual(petstoreEntryIds)
+    expect(getApiEntryIds({ slug: 'api', label: 'API', source: fixtureUrl })).resolves.toEqual(petstoreEntryIds)
   })
 })

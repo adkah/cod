@@ -8,6 +8,7 @@ import type {
   OpenApiOperation,
   OpenApiPathItem,
   OpenApiSpec,
+  Parameter,
   ServerVariable,
 } from './types.js'
 import { slugify } from './utils.js'
@@ -26,7 +27,7 @@ export interface ExtractedApiEntry {
 }
 
 export async function loadOpenApiSpec(source: ApiLoaderOptions['source']): Promise<OpenApiSpec> {
-  if (typeof source === 'function') return source()
+  if (typeof source === 'function') return dereferenceObject(await source())
   if (source instanceof URL) {
     return dereference(source.protocol === 'file:' ? fileURLToPath(source) : source.href)
   }
@@ -40,6 +41,7 @@ export async function loadOpenApiSpec(source: ApiLoaderOptions['source']): Promi
 export async function extractApiEntries(options: ApiLoaderOptions): Promise<ExtractedApiEntry[]> {
   const spec = (await loadOpenApiSpec(options.source)) as OpenApiSpec
   const entries: ExtractedApiEntry[] = []
+  const entrySources = new Map<string, string>()
   const excludedTags = new Set(options.excludeTags ?? [])
   const securitySchemes = spec.components?.securitySchemes
   const server = spec.servers?.[0]
@@ -65,10 +67,19 @@ export async function extractApiEntries(options: ApiLoaderOptions): Promise<Extr
 
       const endpoint = buildEndpoint(buildOptions)
       const title = operation.summary ?? operation.operationId ?? `${method.toUpperCase()} ${path}`
-      const operationSlug = slugify(operation.operationId ?? `${method}-${path}`)
+      const operationSlug = getOperationSlug(method, path, operation)
+      const id = `${options.slug}/${operationSlug}`
+      const sourceLabel = `${method.toUpperCase()} ${path}`
+      const existingSource = entrySources.get(id)
+      if (existingSource !== undefined) {
+        throw new Error(
+          `Duplicate OpenAPI entry id "${id}" generated for ${sourceLabel}; already used by ${existingSource}`
+        )
+      }
+      entrySources.set(id, sourceLabel)
 
       const entry: ExtractedApiEntry = {
-        id: `${options.slug}/${operationSlug}`,
+        id,
         title,
         method: method.toUpperCase(),
         apiSlug: options.slug,
@@ -93,6 +104,11 @@ function shouldExcludeOperation(operation: OpenApiOperation, excludedTags: Set<s
   return (operation.tags ?? []).some((tag) => excludedTags.has(tag))
 }
 
+function getOperationSlug(method: HttpMethod, path: string, operation: OpenApiOperation): string {
+  if (operation.operationId !== undefined) return slugify(operation.operationId)
+  return slugify(`${method}-${path.replaceAll('{', 'by-').replaceAll('}', '')}`)
+}
+
 function buildEndpoint(options: {
   method: HttpMethod
   path: string
@@ -103,7 +119,7 @@ function buildEndpoint(options: {
   securitySchemes?: Endpoint['securitySchemes']
   serverVariables?: ServerVariable[]
 }): Endpoint {
-  const parameters = [...(options.pathItem.parameters ?? []), ...(options.operation.parameters ?? [])]
+  const parameters = mergeParameters(options.pathItem.parameters, options.operation.parameters)
   const endpoint: Endpoint = {
     method: options.method.toUpperCase(),
     path: options.path,
@@ -128,6 +144,17 @@ function buildEndpoint(options: {
   return endpoint
 }
 
+function mergeParameters(pathParameters: Parameter[] = [], operationParameters: Parameter[] = []): Parameter[] {
+  const parameters = new Map<string, Parameter>()
+  for (const parameter of pathParameters) {
+    parameters.set(`${parameter.in}:${parameter.name}`, parameter)
+  }
+  for (const parameter of operationParameters) {
+    parameters.set(`${parameter.in}:${parameter.name}`, parameter)
+  }
+  return [...parameters.values()]
+}
+
 function getServerVariables(variables: Record<string, { default?: string; description?: string }> | undefined) {
   if (!variables) return undefined
   return Object.entries(variables).map(([name, variable]) => {
@@ -143,6 +170,6 @@ async function dereference(source: string): Promise<OpenApiSpec> {
 }
 
 async function dereferenceObject(source: OpenApiSpec): Promise<OpenApiSpec> {
-  const spec = await SwaggerParser.dereference(source as never)
+  const spec = await SwaggerParser.dereference(source as unknown as Parameters<typeof SwaggerParser.dereference>[0])
   return spec as unknown as OpenApiSpec
 }
