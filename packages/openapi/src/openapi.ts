@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import SwaggerParser from '@apidevtools/swagger-parser'
 import type {
   ApiLoaderOptions,
+  DereferencedOpenApiSpec,
   Endpoint,
   HttpMethod,
   OpenApiOperation,
@@ -26,7 +27,7 @@ export interface ExtractedApiEntry {
   endpoint: Endpoint
 }
 
-export async function loadOpenApiSpec(source: ApiLoaderOptions['source']): Promise<OpenApiSpec> {
+export async function loadOpenApiSpec(source: ApiLoaderOptions['source']): Promise<DereferencedOpenApiSpec> {
   if (typeof source === 'function') return dereferenceObject(await source())
   if (source instanceof URL) {
     return dereference(source.protocol === 'file:' ? fileURLToPath(source) : source.href)
@@ -39,7 +40,7 @@ export async function loadOpenApiSpec(source: ApiLoaderOptions['source']): Promi
 }
 
 export async function extractApiEntries(options: ApiLoaderOptions): Promise<ExtractedApiEntry[]> {
-  const spec = (await loadOpenApiSpec(options.source)) as OpenApiSpec
+  const spec = await loadOpenApiSpec(options.source)
   const entries: ExtractedApiEntry[] = []
   const entrySources = new Map<string, string>()
   const excludedTags = new Set(options.excludeTags ?? [])
@@ -164,12 +165,12 @@ function getServerVariables(variables: Record<string, { default?: string; descri
   })
 }
 
-async function dereference(source: string): Promise<OpenApiSpec> {
+async function dereference(source: string): Promise<DereferencedOpenApiSpec> {
   const spec = await SwaggerParser.dereference(source)
-  return spec as unknown as OpenApiSpec
+  return spec as unknown as DereferencedOpenApiSpec
 }
 
-async function dereferenceObject(source: OpenApiSpec): Promise<OpenApiSpec> {
-  const spec = await SwaggerParser.dereference(source as unknown as Parameters<typeof SwaggerParser.dereference>[0])
-  return spec as unknown as OpenApiSpec
+async function dereferenceObject(source: OpenApiSpec): Promise<DereferencedOpenApiSpec> {
+  const spec = await SwaggerParser.dereference(source)
+  return spec as unknown as DereferencedOpenApiSpec
 }

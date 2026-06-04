@@ -5,6 +5,7 @@ export type {
   ApiEntryData,
   ApiLoaderOptions,
   ApiSpecSource,
+  DereferencedOpenApiSpec,
   Endpoint,
   HttpMethod,
   OpenApiOperation,

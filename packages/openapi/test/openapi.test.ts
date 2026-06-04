@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { extractApiEntries, getApiEntryIds, loadOpenApiSpec } from '../src/openapi.js'
+import { extractApiEntries, getApiEntryIds } from '../src/openapi.js'
 import type { OpenApiSpec } from '../src/types.js'
 import { fixturePath, fixtureUrl, petstore } from './fixtures.js'
 
@@ -64,8 +64,11 @@ describe('OpenAPI extraction', () => {
   })
 
   test('loads raw specs and source functions', async () => {
-    const spec = await loadOpenApiSpec(fixturePath)
-    const entries = await extractApiEntries({ slug: 'api', label: 'API', source: () => spec })
+    const entries = await extractApiEntries({
+      slug: 'api',
+      label: 'API',
+      source: () => petstore as unknown as OpenApiSpec,
+    })
 
     expect(entries).toHaveLength(19)
   })

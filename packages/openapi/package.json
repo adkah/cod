@@ -40,7 +40,8 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@apidevtools/swagger-parser": "^12.1.0"
+    "@apidevtools/swagger-parser": "^12.1.0",
+    "openapi-types": "^12.1.3"
   },
   "peerDependencies": {
     "astro": "^6.0.0"

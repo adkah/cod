@@ -1,6 +1,10 @@
+import type { OpenAPI } from 'openapi-types'
+
 export type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete' | 'head' | 'options' | 'trace'
 
-export type OpenApiSpec = Record<string, unknown> & {
+export type OpenApiSpec = OpenAPI.Document
+
+export type DereferencedOpenApiSpec = Record<string, unknown> & {
   paths?: Record<string, OpenApiPathItem>
   servers?: OpenApiServer[]
   security?: SecurityRequirement[]
