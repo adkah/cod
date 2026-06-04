@@ -49,3 +49,14 @@ export function pathnameToSlug(pathname: string): string {
 export function errorToString(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
 }
+
+export function getEntryBadge(entry: { data: { badge?: string; openapi?: unknown } } | undefined): string | undefined {
+  return entry?.data.badge ?? getOpenApiEndpointMethod(entry?.data.openapi)
+}
+
+function getOpenApiEndpointMethod(value: unknown): string | undefined {
+  if (typeof value !== 'object' || value === null || !('endpoint' in value)) return undefined
+  const endpoint = value.endpoint
+  if (typeof endpoint !== 'object' || endpoint === null || !('method' in endpoint)) return undefined
+  return typeof endpoint.method === 'string' ? endpoint.method : undefined
+}

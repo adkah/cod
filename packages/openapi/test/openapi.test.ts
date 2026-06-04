@@ -36,7 +36,6 @@ describe('OpenAPI extraction', () => {
     expect(entries.map((entry) => entry.id)).toEqual(petstoreEntryIds)
     expect(entries[0]).toMatchObject({
       title: 'Add a new pet to the store.',
-      method: 'POST',
       sortOrder: 0,
       openapi: {
         apiSlug: 'api',

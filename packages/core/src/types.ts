@@ -39,7 +39,7 @@ export interface BaseEntryData extends EntryDataExtensions {
   description?: string
   sidebarTitle?: string
   icon?: string
-  method?: string
+  badge?: string
   prose?: boolean
   sortOrder?: number
 }
@@ -79,7 +79,7 @@ export interface SidebarPageNode {
   sidebarTitle?: string
   href: string
   path: string
-  method?: string
+  badge?: string
   icon?: string
 }
 
@@ -101,7 +101,7 @@ export interface BreadcrumbItem {
 export interface PageEntry {
   slug: string
   title: string
-  method?: string
+  badge?: string
 }
 
 export interface SiteContext {

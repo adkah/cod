@@ -25,7 +25,6 @@ describe('apiLoader', () => {
     expect(stored.size).toBe(19)
     expect(stored.get('api/addpet')).toMatchObject({
       title: 'Add a new pet to the store.',
-      method: 'POST',
       openapi: {
         apiSlug: 'api',
         apiLabel: 'API',

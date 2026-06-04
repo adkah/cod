@@ -21,7 +21,6 @@ export function apiLoader(options: ApiLoaderOptions): Loader {
           data: {
             title: entry.title,
             description: entry.description,
-            method: entry.method,
             sortOrder: entry.sortOrder,
             openapi: entry.openapi,
           },

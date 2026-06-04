@@ -228,8 +228,6 @@ export interface ApiEntryData {
   title: string
   /** Long-form operation description, when provided. */
   description?: string
-  /** Uppercase HTTP method for display and filtering. */
-  method: string
   /** Zero-based order based on traversal through paths and methods. */
   sortOrder: number
   /** OpenAPI-specific payload; also acts as the API page discriminator. */

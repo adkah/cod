@@ -25,8 +25,6 @@ export interface ExtractedApiEntry {
   title: string
   /** Long-form operation description, when provided. */
   description?: string
-  /** Uppercase HTTP method for display and filtering. */
-  method: string
   /** Zero-based order based on traversal through paths and methods. */
   sortOrder: number
   /** OpenAPI-specific payload. */
@@ -104,7 +102,6 @@ export async function extractApiEntries(options: ApiLoaderOptions): Promise<Extr
       const entry: ExtractedApiEntry = {
         id,
         title,
-        method: method.toUpperCase(),
         sortOrder: entries.length,
         openapi: {
           apiSlug: options.slug,

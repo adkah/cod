@@ -5,7 +5,7 @@ import { fetchCollectionEntries, getReferencedCollections, getRouteSlugForEntry,
 import { resolveActiveSidebarTree } from './nav.js'
 import { buildSidebarTree } from './tree.js'
 import type { CodConfig, DynamicCollectionEntry, PageContext, PageEntry, SiteContext, StaticPath } from './types.js'
-import { errorToString, normalizeEntryId } from './utils.js'
+import { errorToString, getEntryBadge, normalizeEntryId } from './utils.js'
 
 export class CodSite {
   #config: CodConfig
@@ -101,7 +101,8 @@ function buildPages(config: CodConfig, entriesByCollection: Map<string, DynamicC
         slug: getRouteSlugForEntry(config, collection, entry.id),
         title: entry.data.title,
       }
-      if (entry.data.method) page.method = entry.data.method
+      const badge = getEntryBadge(entry)
+      if (badge) page.badge = badge
       pages.push(page)
     }
   }

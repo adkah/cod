@@ -15,7 +15,7 @@ declare module 'astro:content' {
       description?: string
       sidebarTitle?: string
       icon?: string
-      method?: string
+      badge?: string
       prose?: boolean
       sortOrder?: number
       [key: string]: unknown

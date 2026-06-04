@@ -59,7 +59,6 @@ export const openApiEntryDataSchema = z.object({
 export const apiCollectionSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
-  method: z.string(),
   sortOrder: z.number(),
   openapi: openApiEntryDataSchema,
 })
