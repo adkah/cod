@@ -1,4 +1,7 @@
 import { describe, expect, test } from 'bun:test'
+import { mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { tmpdir } from 'node:os'
 import { extractApiEntries, getApiEntryIds } from '../src/openapi.js'
 import type { OpenApiSpec } from '../src/types.js'
 import { fixturePath, fixtureUrl, petstore } from './fixtures.js'
@@ -71,6 +74,28 @@ describe('OpenAPI extraction', () => {
     })
 
     expect(entries).toHaveLength(19)
+  })
+
+  test('rejects Swagger 2.0 specs with a clear error', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'cod-openapi-'))
+    const specPath = join(directory, 'swagger.json')
+
+    try {
+      await writeFile(
+        specPath,
+        JSON.stringify({
+          swagger: '2.0',
+          info: { title: 'Legacy API', version: '1.0.0' },
+          paths: { '/pets': { get: { responses: { '200': { description: 'OK' } } } } },
+        })
+      )
+
+      await expect(extractApiEntries({ slug: 'api', label: 'API', source: specPath })).rejects.toThrow(
+        'Unsupported OpenAPI spec version'
+      )
+    } finally {
+      await rm(directory, { recursive: true, force: true })
+    }
   })
 
   test('dereferences source function results', async () => {

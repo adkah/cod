@@ -28,15 +28,15 @@ export interface ExtractedApiEntry {
 }
 
 export async function loadOpenApiSpec(source: ApiLoaderOptions['source']): Promise<DereferencedOpenApiSpec> {
-  if (typeof source === 'function') return dereferenceObject(await source())
+  if (typeof source === 'function') return loadOpenApiFromObject(await source())
   if (source instanceof URL) {
-    return dereference(source.protocol === 'file:' ? fileURLToPath(source) : source.href)
+    return loadOpenApiFromLocation(source.protocol === 'file:' ? fileURLToPath(source) : source.href)
   }
   if (typeof source === 'string') {
     const absolutePath = resolve(process.cwd(), source)
-    return dereference(absolutePath)
+    return loadOpenApiFromLocation(absolutePath)
   }
-  return dereferenceObject(source)
+  return loadOpenApiFromObject(source)
 }
 
 export async function extractApiEntries(options: ApiLoaderOptions): Promise<ExtractedApiEntry[]> {
@@ -74,7 +74,7 @@ export async function extractApiEntries(options: ApiLoaderOptions): Promise<Extr
       const existingSource = entrySources.get(id)
       if (existingSource !== undefined) {
         throw new Error(
-          `Duplicate OpenAPI entry id "${id}" generated for ${sourceLabel}; already used by ${existingSource}`
+          `[Cod OpenAPI] Duplicate OpenAPI entry id "${id}" generated for ${sourceLabel}; already used by ${existingSource}`
         )
       }
       entrySources.set(id, sourceLabel)
@@ -165,12 +165,20 @@ function getServerVariables(variables: Record<string, { default?: string; descri
   })
 }
 
-async function dereference(source: string): Promise<DereferencedOpenApiSpec> {
+async function loadOpenApiFromLocation(source: string): Promise<DereferencedOpenApiSpec> {
+  const spec = await SwaggerParser.dereference(source)
+  assertOpenApi3Spec(spec)
+  return spec as unknown as DereferencedOpenApiSpec
+}
+
+async function loadOpenApiFromObject(source: OpenApiSpec): Promise<DereferencedOpenApiSpec> {
+  assertOpenApi3Spec(source)
   const spec = await SwaggerParser.dereference(source)
   return spec as unknown as DereferencedOpenApiSpec
 }
 
-async function dereferenceObject(source: OpenApiSpec): Promise<DereferencedOpenApiSpec> {
-  const spec = await SwaggerParser.dereference(source)
-  return spec as unknown as DereferencedOpenApiSpec
+function assertOpenApi3Spec(spec: unknown): asserts spec is OpenApiSpec {
+  if (typeof spec !== 'object' || spec === null || !('openapi' in spec)) {
+    throw new Error('[Cod OpenAPI] Unsupported OpenAPI spec version; expected an OpenAPI 3.x document')
+  }
 }

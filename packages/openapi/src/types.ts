@@ -1,8 +1,8 @@
-import type { OpenAPI } from 'openapi-types'
+import type { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types'
 
 export type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete' | 'head' | 'options' | 'trace'
 
-export type OpenApiSpec = OpenAPI.Document
+export type OpenApiSpec = OpenAPIV3.Document | OpenAPIV3_1.Document
 
 export type DereferencedOpenApiSpec = Record<string, unknown> & {
   paths?: Record<string, OpenApiPathItem>
