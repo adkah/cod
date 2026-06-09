@@ -51,7 +51,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "check": "tsc -p tsconfig.json --noEmit",
-    "test": "bun test"
+    "test": "vitest run"
   },
   "peerDependencies": {
     "astro": "^6.0.0"

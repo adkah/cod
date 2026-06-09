@@ -1,7 +1,7 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { afterEach, describe, expect, test } from 'bun:test'
+import { afterEach, describe, expect, test } from 'vitest'
 import { getAdjacentPages } from '../src/adjacent.js'
 import { buildBreadcrumbs } from '../src/breadcrumbs.js'
 import { defineCodConfig } from '../src/config.js'

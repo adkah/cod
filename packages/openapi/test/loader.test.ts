@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, test } from 'vitest'
 import { apiLoader } from '../src/loader.js'
 import { fixturePath } from './fixtures.js'
 
